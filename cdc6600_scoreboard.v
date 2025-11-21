@@ -3931,6 +3931,31 @@ Proof.
     rewrite Hfi. assumption.
 Qed.
 
+(** Weaker lemma: busy FU can always execute at least one step *)
+Lemma busy_fu_makes_progress : forall st fu,
+  scoreboard_invariant st ->
+  fu_busy (sb_fu_status st fu) = true ->
+  sb_step st (execute_step fu st).
+Proof.
+  intros st fu Hinv Hbusy.
+  apply (Step_Execute st fu). assumption. reflexivity.
+Qed.
+
+(** Helper: if reg_will_be_read is true, at least one FU is busy and reads that register *)
+Lemma reg_will_be_read_implies_busy_reader : forall fus r,
+  reg_will_be_read fus r = true ->
+  exists fu, fu_busy (fus fu) = true.
+Proof.
+  intros fus r Hwillread.
+  unfold reg_will_be_read in Hwillread.
+  repeat match goal with
+  | [ H: orb ?x ?y = true |- _ ] => apply orb_prop in H; destruct H as [H|H]
+  end;
+  apply andb_prop in Hwillread; destruct Hwillread as [Hbusy _];
+  [ exists FU_Branch | exists FU_Boolean | exists FU_Shift | exists FU_LongAdd | exists FU_FPAdd
+  | exists FU_FPMul1 | exists FU_FPMul2 | exists FU_FPDiv | exists FU_Incr1 | exists FU_Incr2 ];
+  exact Hbusy.
+Qed.
 
 (** WAR hazards eventually clear: if an FU is blocked on WAR, pending readers complete *)
 Lemma war_hazard_eventual_resolution : forall st dest,
@@ -3942,6 +3967,10 @@ Lemma war_hazard_eventual_resolution : forall st dest,
     (exists (fu' : func_unit), fu_busy (sb_fu_status st fu') = true /\
                                 fu_busy (sb_fu_status st' fu') = false).
 Proof.
+  intros st dest Hinv Hwar.
+  unfold third_order_conflict, war_hazard in Hwar.
+  apply reg_will_be_read_implies_busy_reader in Hwar.
+  destruct Hwar as [fu' Hbusy'].
 Admitted.
 
 (** Full eventual completion: busy FU eventually completes *)
