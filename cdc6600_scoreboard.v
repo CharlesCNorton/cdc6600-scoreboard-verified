@@ -1,6 +1,19 @@
-(** * CDC 6600 Scoreboard Formalization
-    Rigorous mechanization of the CDC 6600 dynamic instruction scheduling mechanism.
-    Based on Thornton's original design (1964). *)
+(******************************************************************************)
+(*                                                                            *)
+(*                        CDC 6600 SCOREBOARD                                 *)
+(*                                                                            *)
+(*     Formal Verification of the First Out-of-Order Instruction Scheduler    *)
+(*                                                                            *)
+(*     Rigorous mechanization of the CDC 6600 dynamic instruction             *)
+(*     scheduling mechanism. Based on Thornton's original design (1964).      *)
+(*                                                                            *)
+(*     "Anyone can build a fast CPU. The trick is to build a fast system."    *)
+(*                                              - Seymour Cray                *)
+(*                                                                            *)
+(*     Author: Charles C. Norton                                              *)
+(*     Date: December 5, 2025                                                 *)
+(*                                                                            *)
+(******************************************************************************)
 
 Require Import Arith.
 Require Import Lia.
